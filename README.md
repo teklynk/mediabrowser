@@ -3,7 +3,7 @@ ASP - Media Browser, Browse and Watch media located on your web server, from any
 
 ASP Media Browser uses ASP's file system objects to allow you to browse and play video, music files right in the web app. Each user has their own Playlist. Toggle between Mobile Only files and All Media files. 
 
-Requires: Windows Server, IIS6 or greater, ASP enabled in IIS, MySQL, MIME types set for MP4 files, FFMPEG to convert files. 
+Requires: Windows Server, IIS6 or greater, ASP enabled in IIS, ASPExec.Execute component, MySQL, MIME types set for MP4 files, FFMPEG to convert files. 
 
 Set the default media directory path (E:\MyMedia\) and playlist directory path (C:\inetpub\wwwroot\...) in filemgr.asp.
 
