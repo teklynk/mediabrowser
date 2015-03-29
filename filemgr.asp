@@ -298,7 +298,7 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 				rs.close
 			end if
 			if request.querystring("convertNow")>"" then
-				vidSrc=path+request.querystring("convertNow")
+				vidSrc=""&server.HTMLEncode(path+request.querystring("convertNow"))&""
 				vidDest=server.HTMLEncode(replace(playlistPath+request.querystring("convertNow"),Right(playlistPath+request.querystring("convertNow"),4),".mp4"))
 				Destfilename=Split(vidDest,"\",len(vidDest))
 				for each x in Destfilename
