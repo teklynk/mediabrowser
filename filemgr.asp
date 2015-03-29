@@ -43,7 +43,15 @@
 if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find where it ends
 
 'setting up global variables
-	path = Lcase("F:\Media Files\")'root media directory
+'uncomment IF statement if you want to assign different directory to diffent users based on userlevels
+	'if Session("userlevel")=2 then
+	'	path = Lcase("E:\Videos\") 'root media directory
+	'elseif Session("userlevel")=3 then
+	'	path = Lcase("E:\MYFILES") 'root media directory
+	'else
+		path = Lcase("E:\Media Files\")'root media directory
+	'end if
+	
 	playlistPath = Lcase("C:\inetpub\wwwroot\mediabrowser\myplaylist\"&Session("username")&"\")'playlist directory
 
 	if request.querystring("folder")>"" then
