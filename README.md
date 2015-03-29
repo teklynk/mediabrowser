@@ -12,3 +12,9 @@ Create an Admin user.
 You can also set multiple directories and assign them to different users based on userlevel. Additional coding is required to achieve this.
 
 Install FFMPEG (c:\ffmpeg\bin\ffmpeg.exe) in order to convert files to a "streamable" format (MP4). Users can click Convert and wait until the file is ready to play.
+
+# Screenshots
+![screenshot01](https://github.com/teklynk/mediabrowser/blob/master/mediabrowser_01.png)
+![screenshot02](https://github.com/teklynk/mediabrowser/blob/master/mediabrowser_02.png)
+![screenshot03](https://github.com/teklynk/mediabrowser/blob/master/mediabrowser_03.png)
+![screenshot04](https://github.com/teklynk/mediabrowser/blob/master/mediabrowser_04.png)
