@@ -52,6 +52,8 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 		path = Lcase("E:\Media Files\")'root media directory
 	'end if
 	
+	totalItemsToShow = 20
+	
 	playlistPath = Lcase("C:\inetpub\wwwroot\mediabrowser\myplaylist\"&Session("username")&"\")'playlist directory
 
 	if request.querystring("folder")>"" then
@@ -113,9 +115,9 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 		'''Toggle Show Mobile link based on session variable value
 		if NOT request.querystring("myplaylist")="true" then 
 			if session("mobileFiles")="true" then
-					response.write "<span style=""float:right;""><a href=""?folder="&request.querystring("folder")&"&mobileFiles=false"">Show All Files</a></span>"
+					response.write "<span style=""float:right;""><a href=""?folder="&request.querystring("folder")&"&page="&request.querystring("page")&"&mobileFiles=false"">Show All Files</a></span>"
 			elseif session("mobileFiles")="false" then
-					response.write "<span style=""float:right;""><a href=""?folder="&request.querystring("folder")&"&mobileFiles=true"">Only Show Mobile Files</a></span>"
+					response.write "<span style=""float:right;""><a href=""?folder="&request.querystring("folder")&"&page="&request.querystring("page")&"&mobileFiles=true"">Only Show Mobile Files</a></span>"
 			end if
 		end if
 		
@@ -136,12 +138,12 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 				else
 					if request.querystring("folder")>"" then
 						response.write "<tr>"
-						response.write "<td class=""fileType""><i class=""icon-black icon-folder-close""></i></td><td><a href=""?folder="&request.querystring("folder")&"/"&x.Name&""" style=""word-wrap: break-word;""> "&x.Name&"</a></td>"&vbCrLf
+						response.write "<td class=""fileType""><i class=""icon-black icon-folder-close""></i></td><td><a href=""?folder="&request.querystring("folder")&"/"&x.Name&"&page=1"" style=""word-wrap: break-word;""> "&x.Name&"</a></td>"&vbCrLf
 						response.write "<td></td>"&vbCrLf
 						response.write "</tr>"&vbCrLf
 					else
 						response.write "<tr>"
-						response.write "<td class=""fileType""><i class=""icon-black icon-folder-close""></i></td><td><a href=""?folder="&x.Name&""" style=""word-wrap: break-word;""> "&x.Name&"</a></td>"&vbCrLf
+						response.write "<td class=""fileType""><i class=""icon-black icon-folder-close""></i></td><td><a href=""?folder="&x.Name&"&page=1"" style=""word-wrap: break-word;""> "&x.Name&"</a></td>"&vbCrLf
 						response.write "<td></td>"&vbCrLf
 						response.write "</tr>"&vbCrLf
 					end if
@@ -150,8 +152,23 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 
 		'List Files
 		count=0
+		tcount=0
+		
+			For Each t in Myfolder.files
+				if session("mobileFiles")="true" then
+					fileTypeLimit1=Right(t.Name,4) = ".mp4" OR Right(t.Name,4) = ".mp3"
+				else
+					fileTypeLimit1=Right(t.Name,4) = ".mp4" OR Right(t.Name,4) = ".avi" OR Right(t.Name,4)=".mov" OR Right(t.Name,4)=".wmv" OR Right(t.Name,4) = ".mp3" OR Right(t.Name,4)=".mkv" 
+				end if
+				if NOT (fileTypeLimit1) then
+					response.write ""
+				else
+					tcount=tcount+1
+				end if
+			Next
+			
 			For Each x in Myfolder.files
-				count=count+1
+				
 				'Skip all files Except for these
 				if session("mobileFiles")="true" then
 					fileTypeLimit=Right(x.Name,4) = ".mp4" OR Right(x.Name,4) = ".mp3"
@@ -162,6 +179,9 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 				if NOT (fileTypeLimit) then
 					response.write ""
 				else
+				
+					count=count+1
+					
 					'set icons for file types
 					if (Right(x.Name,4)=".mp4" OR Right(x.Name,4)=".avi" OR Right(x.Name,4)=".mov" OR Right(x.Name,4)=".wmv" OR Right(x.Name,4)=".mkv" ) then
 						fileIcon = "icon-black icon-film"
@@ -178,6 +198,7 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 					end if
 					
 					if request.querystring("folder")>"" then
+
 						response.write "<tr>"&vbCrLf
 						response.write "<td class=""fileType""><i class="""&fileIcon&""" title="""&fileTitle&"""></i></td>"&vbCrLf
 						response.write "<td><a href=""?playlist=add&file="&request.querystring("folder")&"/"&x.Name&""" title=""Add to Playlist"" style=""word-wrap: break-word;"" class=""addtoPlaylist""> "&x.Name&"</a></td>"&vbCrLf
@@ -241,7 +262,7 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 									fileSize="100mb"
 								elseif activeFileSize>50000000 then '50mb
 									fileSize="50mb"
-								elseif activeFileSize>25000000 then '50mb
+								elseif activeFileSize>25000000 then '25mb
 									fileSize="25mb"
 								else
 									fileSize="10mb"
@@ -265,8 +286,26 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 					else
 						response.write "<div class=""alert alert-error""><a class=""close"" data-dismiss=""alert"" href=""?dismiss=1"">×</a>No Files Found.</div>"&vbCrLf
 					end if
+					
+					'get item and page counts
+					PageNum = request.querystring("page")
+					pageSet = (PageNum -1) * totalItemsToShow + totalItemsToShow 
+					pageNext = "<span style=""float:left;"">Showing: ("&pageSet&" of "&tcount&") <a href=""?folder="&request.querystring("folder")&"&page="&pagenum+1&""">Next "&totalItemsToShow&" Items</a> <i class=""icon-arrow-right""></i></span>"
+					
+					if NOT count = (PageNum -1) * totalItemsToShow + totalItemsToShow then
+						count=count
+						pageSet = "All"
+						pageNext = "<span style=""float:left;"">Showing: ("&pageSet&" of "&tcount&")</span>"
+					else
+						Exit For
+					end if
+					
 				end if
 			Next
+			
+			if request.querystring("folder")>"" then
+				response.write pageNext
+			end if
 			
 			'response.write count
 			Call InQueue
@@ -336,6 +375,16 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 				response.redirect("?myplaylist=true")
 			end if
 		end if
+	End Sub
+	
+	Sub TaskKill
+		Set objExecutor = Server.CreateObject("ASPExec.Execute")
+		objExecutor.Application = "cmd.exe" 
+		objExecutor.Parameters = "/c taskkill /F /IM ffmpeg.exe"
+		objExecutor.ShowWindow = false
+		sResult = objExecutor.ExecuteWinApp
+		Set objExecutor=Nothing
+		response.redirect ("?myplaylist=true")
 	End Sub
 
 	Sub AddtoPlaylist
@@ -505,6 +554,8 @@ if Session("logon")="true" then 'The Big IF Statement - Scroll to bottom to find
 		PlayFile
 	elseif (Request.Querystring("remove")  > "" AND Session("logon")="true") then
 		DeleteFile
+	elseif (Request.Querystring("taskkill")  > "" AND Session("logon")="true") then
+		TaskKill
 	else
 		ListFolderContents
 	end if
